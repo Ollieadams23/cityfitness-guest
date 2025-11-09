@@ -124,6 +124,24 @@
             cursor: not-allowed;
             transform: none;
         }
+
+        .btn-secondary {
+            width: 100%;
+            padding: 12px;
+            margin-top: 10px;
+            background: #ef4444;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.2s ease;
+        }
+
+        .btn-secondary:hover {
+            opacity: 0.9;
+        }
         
         .status-message {
             margin-top: 20px;
@@ -182,50 +200,56 @@
             
             <div class="form-group">
                 <label for="memberfirstname">Member First Name</label>
-                <input type="text" id="memberfirstname" name="memberfirstname" value="ollie" required>
+                <input type="text" id="memberfirstname" name="memberfirstname" value="" placeholder="e.g. John" required>
             </div>
             
             <div class="form-group">
                 <label for="memberlastname">Member Last Name</label>
-                <input type="text" id="memberlastname" name="memberlastname" value="adams" required>
+                <input type="text" id="memberlastname" name="memberlastname" value="" placeholder="e.g. Smith" required>
             </div>
             
             <div class="form-group">
                 <label for="keytag">Member Key Tag Number</label>
-                <input type="text" id="keytag" name="keytag" value="841700" required>
+                <input type="text" id="keytag" name="keytag" value="" placeholder="e.g. 841700" required>
             </div>
             
             <div class="section-title">Guest Information</div>
             
             <div class="form-group">
                 <label for="guestfirstname">Guest First Name</label>
-                <input type="text" id="guestfirstname" name="guestfirstname" value="Ollie" required>
+                <input type="text" id="guestfirstname" name="guestfirstname" value="" placeholder="e.g. Ollie" required>
             </div>
             
             <div class="form-group">
                 <label for="guestlastname">Guest Last Name</label>
-                <input type="text" id="guestlastname" name="guestlastname" value="Adams" required>
+                <input type="text" id="guestlastname" name="guestlastname" value="" placeholder="e.g. Adams" required>
             </div>
             
             <div class="form-group">
                 <label for="email">Guest Email</label>
-                <input type="email" id="email" name="email" value="clintz23@gmail.com" required>
+                <input type="email" id="email" name="email" value="" placeholder="e.g. john@example.com" required>
             </div>
             
             <div class="form-group">
                 <label for="phone">Guest Phone</label>
-                <input type="tel" id="phone" name="phone" value="0226906997" required>
+                <input type="tel" id="phone" name="phone" value="" placeholder="e.g. 022 123 4567" required>
             </div>
             
             <div class="checkbox-group">
-                <input type="checkbox" id="terms" name="terms" checked required>
+                <input type="checkbox" id="terms" name="terms" required>
                 <label for="terms">I agree to the terms and conditions</label>
+            </div>
+
+            <div class="checkbox-group">
+                <input type="checkbox" id="remember" name="remember" checked>
+                <label for="remember">Remember my details on this device</label>
             </div>
             
             <input type="hidden" name="clubId" value="42">
             <input type="hidden" name="club" value="Invercargill">
             
             <button type="submit" class="btn-submit" id="submitBtn">Submit Guest Pass</button>
+            <button type="button" class="btn-secondary" id="clearBtn">Clear Saved Details</button>
             
             <div id="statusMessage" class="status-message"></div>
         </form>
@@ -234,7 +258,11 @@
     <script>
         const form = document.getElementById('guestAccessForm');
         const submitBtn = document.getElementById('submitBtn');
+        const clearBtn = document.getElementById('clearBtn');
         const statusMessage = document.getElementById('statusMessage');
+        const STORAGE_KEY = 'gymGuestForm';
+
+        const FIELD_IDS = ['memberfirstname','memberlastname','keytag','guestfirstname','guestlastname','email','phone','clubId','club','terms'];
         
         function showStatus(message, type) {
             statusMessage.textContent = message;
@@ -246,6 +274,64 @@
             statusMessage.style.display = 'none';
         }
         
+        function loadSaved() {
+            try {
+                const raw = localStorage.getItem(STORAGE_KEY);
+                if (!raw) return;
+                const saved = JSON.parse(raw);
+                let anyLoaded = false;
+                FIELD_IDS.forEach(id => {
+                    if (saved[id] !== undefined && saved[id] !== null) {
+                        const el = document.querySelector(`[name="${id}"]`);
+                        if (!el) return;
+                        if (el.type === 'checkbox') {
+                            el.checked = !!saved[id];
+                        } else {
+                            el.value = saved[id];
+                        }
+                        anyLoaded = true;
+                    }
+                });
+                if (anyLoaded) showStatus('Loaded saved details. Review and submit.', 'loading');
+            } catch (e) {
+                console.warn('Failed to load saved details', e);
+            }
+        }
+
+        function saveIfRequested() {
+            const remember = document.getElementById('remember');
+            if (!remember || !remember.checked) return;
+            const data = {};
+            FIELD_IDS.forEach(id => {
+                const el = document.querySelector(`[name="${id}"]`);
+                if (!el) return;
+                data[id] = (el.type === 'checkbox') ? el.checked : el.value;
+            });
+            data.savedAt = new Date().toISOString();
+            try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+            } catch (e) {
+                console.warn('Failed to save details', e);
+            }
+        }
+
+        function clearSaved() {
+            localStorage.removeItem(STORAGE_KEY);
+            // Clear form fields (except hidden club fields)
+            ['memberfirstname','memberlastname','keytag','guestfirstname','guestlastname','email','phone'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.value = '';
+            });
+            const terms = document.getElementById('terms');
+            if (terms) terms.checked = false;
+            showStatus('Saved details cleared. Enter details to continue.', 'error');
+        }
+
+        // Initialize on first load
+        document.addEventListener('DOMContentLoaded', loadSaved);
+
+        clearBtn.addEventListener('click', clearSaved);
+
         form.addEventListener('submit', function(e) {
             e.preventDefault();
             
@@ -265,6 +351,9 @@
                 urlEncoded.append(pair[0], pair[1]);
             }
             
+            // Persist details if requested
+            saveIfRequested();
+
             showStatus('Submitting guest pass...', 'loading');
             
             fetch('https://kiosk.cityfitness.co.nz/kiosk/guestaccessform', {
