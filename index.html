@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>CityFitness Guest Access</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#667eea">
+    <link rel="manifest" href="manifest.json">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Gym Guest">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            padding: 40px;
+            max-width: 500px;
+            width: 100%;
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+        
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #444;
+            font-weight: 500;
+            font-size: 14px;
+        }
+        
+        input[type="text"],
+        input[type="email"],
+        input[type="tel"],
+        select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+        
+        input:focus,
+        select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+        
+        .checkbox-group input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            margin-right: 10px;
+            cursor: pointer;
+        }
+        
+        .checkbox-group label {
+            margin: 0;
+            cursor: pointer;
+            font-weight: normal;
+        }
+        
+        .btn-submit {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+        
+        .btn-submit:active {
+            transform: translateY(0);
+        }
+        
+        .btn-submit:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            width: 100%;
+            padding: 12px;
+            margin-top: 10px;
+            background: #ef4444;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.2s ease;
+        }
+
+        .btn-secondary:hover {
+            opacity: 0.9;
+        }
+        
+        .status-message {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            font-weight: 500;
+            display: none;
+        }
+        
+        .status-message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .status-message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .status-message.loading {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        
+        .section-title {
+            color: #667eea;
+            font-size: 16px;
+            font-weight: 600;
+            margin: 25px 0 15px 0;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+        
+        @media (max-width: 600px) {
+            .container {
+                padding: 30px 20px;
+            }
+            
+            h1 {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🏋️ Guest Access Form</h1>
+        <p class="subtitle">CityFitness - Invercargill</p>
+        
+        <form id="guestAccessForm">
+            <div class="section-title">Member Information</div>
+            
+            <div class="form-group">
+                <label for="memberfirstname">Member First Name</label>
+                <input type="text" id="memberfirstname" name="memberfirstname" value="" placeholder="e.g. John" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="memberlastname">Member Last Name</label>
+                <input type="text" id="memberlastname" name="memberlastname" value="" placeholder="e.g. Smith" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="keytag">Member Key Tag Number</label>
+                <input type="text" id="keytag" name="keytag" value="" placeholder="e.g. 841700" required>
+            </div>
+            
+            <div class="section-title">Guest Information</div>
+            
+            <div class="form-group">
+                <label for="guestfirstname">Guest First Name</label>
+                <input type="text" id="guestfirstname" name="guestfirstname" value="" placeholder="e.g. Ollie" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="guestlastname">Guest Last Name</label>
+                <input type="text" id="guestlastname" name="guestlastname" value="" placeholder="e.g. Adams" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="email">Guest Email</label>
+                <input type="email" id="email" name="email" value="" placeholder="e.g. john@example.com" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="phone">Guest Phone</label>
+                <input type="tel" id="phone" name="phone" value="" placeholder="e.g. 022 123 4567" required>
+            </div>
+            
+            <div class="checkbox-group">
+                <input type="checkbox" id="terms" name="terms" required>
+                <label for="terms">I agree to the terms and conditions</label>
+            </div>
+
+            <div class="checkbox-group">
+                <input type="checkbox" id="remember" name="remember" checked>
+                <label for="remember">Remember my details on this device</label>
+            </div>
+            
+            <input type="hidden" name="clubId" value="42">
+            <input type="hidden" name="club" value="Invercargill">
+            
+            <button type="submit" class="btn-submit" id="submitBtn">Submit Guest Pass</button>
+            <button type="button" class="btn-secondary" id="clearBtn">Clear Saved Details</button>
+            
+            <div id="statusMessage" class="status-message"></div>
+        </form>
+    </div>
+
+    <script>
+        const form = document.getElementById('guestAccessForm');
+        const submitBtn = document.getElementById('submitBtn');
+        const clearBtn = document.getElementById('clearBtn');
+        const statusMessage = document.getElementById('statusMessage');
+        const STORAGE_KEY = 'gymGuestForm';
+
+        const FIELD_IDS = ['memberfirstname','memberlastname','keytag','guestfirstname','guestlastname','email','phone','clubId','club','terms'];
+        
+        function showStatus(message, type) {
+            statusMessage.textContent = message;
+            statusMessage.className = `status-message ${type}`;
+            statusMessage.style.display = 'block';
+        }
+        
+        function hideStatus() {
+            statusMessage.style.display = 'none';
+        }
+        
+        function loadSaved() {
+            try {
+                const raw = localStorage.getItem(STORAGE_KEY);
+                if (!raw) return;
+                const saved = JSON.parse(raw);
+                let anyLoaded = false;
+                FIELD_IDS.forEach(id => {
+                    if (saved[id] !== undefined && saved[id] !== null) {
+                        const el = document.querySelector(`[name="${id}"]`);
+                        if (!el) return;
+                        if (el.type === 'checkbox') {
+                            el.checked = !!saved[id];
+                        } else {
+                            el.value = saved[id];
+                        }
+                        anyLoaded = true;
+                    }
+                });
+                if (anyLoaded) showStatus('Loaded saved details. Review and submit.', 'loading');
+            } catch (e) {
+                console.warn('Failed to load saved details', e);
+            }
+        }
+
+        function saveIfRequested() {
+            const remember = document.getElementById('remember');
+            if (!remember || !remember.checked) return;
+            const data = {};
+            FIELD_IDS.forEach(id => {
+                const el = document.querySelector(`[name="${id}"]`);
+                if (!el) return;
+                data[id] = (el.type === 'checkbox') ? el.checked : el.value;
+            });
+            data.savedAt = new Date().toISOString();
+            try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+            } catch (e) {
+                console.warn('Failed to save details', e);
+            }
+        }
+
+        function clearSaved() {
+            localStorage.removeItem(STORAGE_KEY);
+            // Clear form fields (except hidden club fields)
+            ['memberfirstname','memberlastname','keytag','guestfirstname','guestlastname','email','phone'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.value = '';
+            });
+            const terms = document.getElementById('terms');
+            if (terms) terms.checked = false;
+            showStatus('Saved details cleared. Enter details to continue.', 'error');
+        }
+
+        // Initialize on first load
+        document.addEventListener('DOMContentLoaded', loadSaved);
+
+        clearBtn.addEventListener('click', clearSaved);
+
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Disable submit button
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Submitting...';
+            hideStatus();
+            
+            const formData = new FormData(form);
+            
+            // Convert checkbox to boolean string
+            formData.set('terms', document.getElementById('terms').checked);
+            
+            // Convert to URL encoded format
+            const urlEncoded = new URLSearchParams();
+            for (const pair of formData.entries()) {
+                urlEncoded.append(pair[0], pair[1]);
+            }
+            
+            // Persist details if requested
+            saveIfRequested();
+
+            showStatus('Submitting guest pass...', 'loading');
+            
+            fetch('https://kiosk.cityfitness.co.nz/kiosk/guestaccessform', {
+                method: 'POST',
+                body: urlEncoded,
+                mode: 'no-cors' // Bypass CORS restrictions but can't read response
+            })
+            .then(response => {
+                // With no-cors mode, we can't read the response
+                // But if we get here without error, the request was sent
+                console.log('Request sent successfully (no-cors mode)');
+                showStatus('✓ Guest pass request submitted! The form has been sent to CityFitness.', 'success');
+            })
+            .catch((error) => {
+                console.error('Error submitting form:', error);
+                
+                // Check if it's a CORS/fetch error
+                if (error.name === 'TypeError' && error.message.includes('fetch')) {
+                    showStatus('⚠ CORS Error: This form must be submitted from the CityFitness kiosk or their website. Contact gym staff for assistance.', 'error');
+                } else {
+                    showStatus('✗ Network error: ' + error.message, 'error');
+                }
+            })
+            .finally(() => {
+                // Re-enable submit button
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Submit Guest Pass';
+            });
+        });
+        
+        // Register Service Worker for PWA
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('./sw.js')
+                .then(reg => console.log('Service Worker registered'))
+                .catch(err => console.log('Service Worker registration failed'));
+        }
+    </script>
+</body>
+</html>
