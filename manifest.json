@@ -2,7 +2,7 @@
   "name": "CityFitness Guest Pass",
   "short_name": "Gym Guest",
   "description": "Quick guest pass submission for CityFitness Invercargill",
-  "start_url": "/index.html",
+  "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#667eea",
   "theme_color": "#667eea",

@@ -1,7 +1,8 @@
 // Service Worker for offline capability
 const CACHE_NAME = 'gym-guest-v1';
 const urlsToCache = [
-  '/index.html'
+  './index.html',
+  './'
 ];
 
 self.addEventListener('install', event => {
