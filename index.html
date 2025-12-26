@@ -356,26 +356,38 @@
 
             showStatus('Submitting guest pass...', 'loading');
             
-            fetch('https://kiosk.cityfitness.co.nz/kiosk/guestaccessform', {
+            // Use Netlify function as proxy to avoid CORS issues
+            // When deployed on Netlify, this will be /.netlify/functions/submit-guest
+            // For local testing with direct API, change this URL
+            const apiUrl = window.location.hostname === 'localhost' 
+                ? 'https://kiosk.cityfitness.co.nz/kiosk/guestaccessform' 
+                : '/.netlify/functions/submit-guest';
+            
+            fetch(apiUrl, {
                 method: 'POST',
-                body: urlEncoded,
-                mode: 'no-cors' // Bypass CORS restrictions but can't read response
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: urlEncoded
             })
             .then(response => {
-                // With no-cors mode, we can't read the response
-                // But if we get here without error, the request was sent
-                console.log('Request sent successfully (no-cors mode)');
-                showStatus('✓ Guest pass request submitted! The form has been sent to CityFitness.', 'success');
+                console.log('Response status:', response.status);
+                console.log('Response headers:', response.headers);
+                
+                // Log the full response for debugging
+                return response.text().then(text => {
+                    console.log('Response body:', text);
+                    
+                    if (response.ok) {
+                        showStatus('✓ Guest pass request submitted successfully!', 'success');
+                    } else {
+                        showStatus(`⚠ Server returned status ${response.status}. Response: ${text.substring(0, 100)}`, 'error');
+                    }
+                });
             })
             .catch((error) => {
                 console.error('Error submitting form:', error);
-                
-                // Check if it's a CORS/fetch error
-                if (error.name === 'TypeError' && error.message.includes('fetch')) {
-                    showStatus('⚠ CORS Error: This form must be submitted from the CityFitness kiosk or their website. Contact gym staff for assistance.', 'error');
-                } else {
-                    showStatus('✗ Network error: ' + error.message, 'error');
-                }
+                showStatus('✗ Error: ' + error.message + ' (Check console for details)', 'error');
             })
             .finally(() => {
                 // Re-enable submit button
