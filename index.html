@@ -351,6 +351,9 @@
                 urlEncoded.append(pair[0], pair[1]);
             }
             
+            // Log what we're sending for debugging
+            console.log('Submitting form data:', urlEncoded.toString());
+            
             // Persist details if requested
             saveIfRequested();
 
@@ -379,9 +382,11 @@
                     console.log('Response body:', text);
                     
                     if (response.ok) {
-                        // CityFitness returns HTML - check if it's a success page
-                        if (text.includes('<!DOCTYPE') || text.includes('<html')) {
-                            // It's HTML - assume success if status is 200
+                        // Check if CityFitness returned an error page
+                        if (text.includes('CityFitness - Error') || text.includes('/error')) {
+                            showStatus('⚠ CityFitness returned an error. Please check the form data or contact gym staff.', 'error');
+                        } else if (text.includes('<!DOCTYPE') || text.includes('<html')) {
+                            // It's HTML - assume success if no error detected
                             showStatus('✓ Guest pass submitted successfully! Your guest has been registered with CityFitness.', 'success');
                         } else {
                             // Show the response if it's not HTML
