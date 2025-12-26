@@ -379,9 +379,11 @@
                     console.log('Response body:', text);
                     
                     if (response.ok) {
-                        showStatus('✓ Guest pass request submitted successfully!', 'success');
+                        // Show success with CityFitness response
+                        const preview = text.length > 200 ? text.substring(0, 200) + '...' : text;
+                        showStatus('✓ Guest pass submitted! CityFitness response: ' + preview, 'success');
                     } else {
-                        showStatus(`⚠ Server returned status ${response.status}. Response: ${text.substring(0, 100)}`, 'error');
+                        showStatus(`⚠ Server returned status ${response.status}. Response: ${text.substring(0, 200)}`, 'error');
                     }
                 });
             })
