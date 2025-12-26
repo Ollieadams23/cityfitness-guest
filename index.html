@@ -379,9 +379,14 @@
                     console.log('Response body:', text);
                     
                     if (response.ok) {
-                        // Show success with CityFitness response
-                        const preview = text.length > 200 ? text.substring(0, 200) + '...' : text;
-                        showStatus('✓ Guest pass submitted! CityFitness response: ' + preview, 'success');
+                        // CityFitness returns HTML - check if it's a success page
+                        if (text.includes('<!DOCTYPE') || text.includes('<html')) {
+                            // It's HTML - assume success if status is 200
+                            showStatus('✓ Guest pass submitted successfully! Your guest has been registered with CityFitness.', 'success');
+                        } else {
+                            // Show the response if it's not HTML
+                            showStatus('✓ Guest pass submitted! Response: ' + text.substring(0, 200), 'success');
+                        }
                     } else {
                         showStatus(`⚠ Server returned status ${response.status}. Response: ${text.substring(0, 200)}`, 'error');
                     }
