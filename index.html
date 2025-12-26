@@ -342,8 +342,11 @@
             
             const formData = new FormData(form);
             
-            // Convert checkbox to boolean string
-            formData.set('terms', document.getElementById('terms').checked);
+            // Remove 'remember' field - it's only for local storage, not for CityFitness
+            formData.delete('remember');
+            
+            // Convert checkbox to 'on' for proper form submission (not boolean)
+            formData.set('terms', document.getElementById('terms').checked ? 'on' : 'off');
             
             // Convert to URL encoded format
             const urlEncoded = new URLSearchParams();
